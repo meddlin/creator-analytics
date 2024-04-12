@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    container_name: local_pgdb
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: meddlin
+      POSTGRES_PASSWORD: Password1
+      POSTGRES_DB: social-analytics
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: meddlin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: Password1
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3030:3000"
+    environment:
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=db
+      - GF_DATABASE_PORT=5432
+      - GF_DATABASE_NAME=social-analytics
+      - GF_DATABASE_USER=meddlin
+      - GF_DATABASE_PASSWORD=Password1
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - db
+
+volumes:
+  local_pgdata: 
+  pgadmin-data:
+  grafana-storage:
